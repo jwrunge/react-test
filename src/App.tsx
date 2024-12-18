@@ -10,18 +10,18 @@ function App() {
 
 	const [bananas, setBananas] = useState(new Map<HTMLImageElement, Banana>());
 
-	function transitionBanana(fn: () => void) {
-		fn();
-		// el.style.viewTransitionName = el.id;
+	function transitionBanana(el: HTMLImageElement, fn: () => void) {
+		el.style.viewTransitionName = el.id;
 
-		// const animation = document?.startViewTransition(() => {
-		// 	tradeBanana(to);
-		// 	showBananas();
-		// });
+		if (document?.startViewTransition) {
+			const animation = document?.startViewTransition(fn);
 
-		// animation?.finished?.then(() => {
-		// 	el.style.viewTransitionName = "";
-		// });
+			animation?.finished?.then(() => {
+				el.style.viewTransitionName = "";
+			});
+		} else {
+			fn();
+		}
 	}
 
 	function addBanana(to: "left" | "right") {
@@ -58,7 +58,7 @@ function App() {
 		const [bananaEl, banana] = bananaRef;
 		if (banana) banana.side = to;
 
-		transitionBanana(() => {
+		transitionBanana(bananaEl, () => {
 			const toPileEl = document.querySelector(`#pile-${to}`);
 			toPileEl?.appendChild(bananaEl);
 		});

@@ -9,19 +9,32 @@ function App() {
 	};
 
 	const [bananas, setBananas] = useState(new Map<HTMLImageElement, Banana>());
+	const [leftCount, setLeftCount] = useState(0);
+	const [rightCount, setRightCount] = useState(0);
 
-	function transitionBanana(el: HTMLImageElement, fn: () => void) {
-		el.style.viewTransitionName = el.id;
+	async function transitionBanana(el: HTMLImageElement, fn: () => void) {
+		el.style.setProperty("view-transition-name", el.id);
 
 		if (document?.startViewTransition) {
 			const animation = document?.startViewTransition(fn);
 
-			animation?.finished?.then(() => {
-				el.style.viewTransitionName = "";
-			});
+			await animation?.finished;
+			el.style.removeProperty("view-transition-name");
 		} else {
 			fn();
 		}
+	}
+
+	function adjustCounts() {
+		const left = Array.from(bananas).filter(
+			(b) => b[1].side === "left"
+		).length;
+		const right = Array.from(bananas).filter(
+			(b) => b[1].side === "right"
+		).length;
+
+		setLeftCount(left);
+		setRightCount(right);
 	}
 
 	function addBanana(to: "left" | "right") {
@@ -32,9 +45,20 @@ function App() {
 
 		bananaEl.src = "banana.png";
 		bananaEl.id = `banana-${id}`;
-		pileEl?.appendChild(bananaEl);
+		bananaEl.classList.add("banana");
+
+		const maxRotation = 30;
+		const minRotation = -30;
+		const rotation =
+			Math.floor(Math.random() * (maxRotation - minRotation + 1)) +
+			minRotation;
+		bananaEl.style.setProperty("--rotation", `${rotation}deg`);
+
+		pileEl?.append(bananaEl);
 		bananas.set(bananaEl, banana);
 		setBananas(bananas);
+
+		adjustCounts();
 	}
 
 	function removeBanana(from: "left" | "right") {
@@ -46,6 +70,8 @@ function App() {
 			bananas.delete(banana[0]);
 			setBananas(bananas);
 		}
+
+		adjustCounts();
 	}
 
 	function tradeBanana(to: "left" | "right") {
@@ -61,6 +87,9 @@ function App() {
 		transitionBanana(bananaEl, () => {
 			const toPileEl = document.querySelector(`#pile-${to}`);
 			toPileEl?.appendChild(bananaEl);
+			setTimeout(() => {
+				adjustCounts();
+			}, 0); // Ensure counts are adjusted after the transition
 		});
 	}
 
@@ -87,7 +116,7 @@ function App() {
 					<div className="pile" id="pile-left"></div>
 					<div className="inc-dec">
 						<button onClick={() => removeBanana("left")}>-</button>
-						{/* <span>{Array.from(bananas).filter([_el, banana]=> banana.side === )?.length ?? 0}</span> */}
+						<span className="count">{leftCount}</span>
 						<button onClick={() => addBanana("left")}>+</button>
 					</div>
 					<button onClick={() => tradeBanana("right")}>Move</button>
@@ -98,7 +127,7 @@ function App() {
 					<div className="pile" id="pile-right"></div>
 					<div className="inc-dec">
 						<button onClick={() => removeBanana("right")}>-</button>
-						{/* <span>{Array.from(bananas).filter([_el, banana]=> banana.side === )?.length ?? 0}</span> */}
+						<span className="count">{rightCount}</span>
 						<button onClick={() => addBanana("right")}>+</button>
 					</div>
 					<button onClick={() => tradeBanana("left")}>Move</button>

@@ -13,11 +13,9 @@ function App() {
 	const [rightCount, setRightCount] = useState(0);
 
 	async function transitionBanana(el: HTMLImageElement, fn: () => void) {
-		el.style.setProperty("view-transition-name", el.id);
-
 		if (document?.startViewTransition) {
+			el.style.setProperty("view-transition-name", "transit-banana");
 			const animation = document?.startViewTransition(fn);
-
 			await animation?.finished;
 			el.style.removeProperty("view-transition-name");
 		} else {
@@ -46,6 +44,7 @@ function App() {
 		bananaEl.src = "banana.png";
 		bananaEl.id = `banana-${id}`;
 		bananaEl.classList.add("banana");
+		console.log("ID", bananaEl.id);
 
 		const maxRotation = 30;
 		const minRotation = -30;
@@ -99,14 +98,8 @@ function App() {
 			<section id="instructions">
 				<h2>Let's see what I remember about React</h2>
 				<p>
-					Some instructions: Adjust the counter to move bananas
-					between piles.
-				</p>
-				<p>
-					Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-					Ratione, sed laudantium veniam harum consequatur totam
-					itaque quod voluptas quasi vel eius fugit aliquid nesciunt,
-					incidunt repudiandae consequuntur consectetur, amet modi?
+					Some instructions: Adjust the counters to add, remove, and
+					move bananas between piles.
 				</p>
 			</section>
 

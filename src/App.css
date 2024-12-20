@@ -60,13 +60,6 @@ img.banana {
 	transition: transform 0.5s;
 }
 
-::view-transition-old(transit-banana) {
-	transform: scale(5) rotate(var(--rotation));
-}
-::view-transition-new(transit-banana) {
-	transform: scale(5) rotate(var(--rotation));
-}
-
 .pile {
 	width: 15rem;
 	display: flex;
